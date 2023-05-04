@@ -1,5 +1,11 @@
 package aitutor
 
+import (
+	"encoding/json"
+
+	"sigs.k8s.io/yaml"
+)
+
 type Prompt struct {
 	Init    string  `json:"init"`
 	AITutor AITutor `json:"ai_tutor"`
@@ -45,4 +51,19 @@ type StudentPreferences struct {
 	LearningStyle      []string `json:"learning_style"`
 	ReasoningFramework []string `json:"reasoning_framework"`
 	ToneStyle          []string `json:"tone_style"`
+}
+
+func (pr *Prompt) MarshalJSON(prefix, indent string) ([]byte, error) {
+	if len(prefix) > 0 || len(indent) > 0 {
+		return json.MarshalIndent(pr, prefix, indent)
+	}
+	return json.Marshal(pr)
+}
+
+func (pr *Prompt) MarshalYAML() ([]byte, error) {
+	if jbytes, err := pr.MarshalJSON("", ""); err != nil {
+		return []byte{}, err
+	} else {
+		return yaml.JSONToYAML(jbytes)
+	}
 }
